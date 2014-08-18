@@ -1,5 +1,5 @@
 /*jslint browser: true*/
-/*! appLayout.js v0.0.2 | (c) 2014 Martin Adamko | Licence MIT */
+/*! appLayout.js v0.0.3 | (c) 2014 Martin Adamko | Licence MIT */
 (function(window, eventName) {
     var debug = window.location.search.match(/[\?&]debug-app-layout=true/) ? true : false,
         document,
@@ -24,18 +24,29 @@
         AppLayout = function() {
             this.settings = {};
             this.init = function() {
+                this.content = window.document.getElementById(this.settings.content);
+                if (!this.content) {
+                    if (debug) console.warn('AppLayout: Content element  #' + this.settings.content + '  missing.');
+                    
+                    return;
+                }
+                
                 this.header = window.document.getElementById(this.settings.header);
                 this.headerContainer = this.header ? this.header.getElementsByClassName(this.settings.containers) : null;
+                
                 if (this.headerContainer) {
                     this.headerContainer = this.headerContainer[0];
+                } else {
+                    if (debug) console.info('AppLayout: Header element #' + this.settings.header + ' is missing');
                 }
 
-                this.content = window.document.getElementById(this.settings.content);
 
                 this.footer = window.document.getElementById(this.settings.footer);
                 this.footerContainers = this.footer ? this.footer.getElementsByClassName(this.settings.containers) : null;
                 if (this.footerContainers) {
                     this.footerContainers = this.footerContainers[0];
+                } else {
+                    if (debug) console.info('AppLayout: Footer element  #' + this.settings.footer + '  missing.');
                 }
 
 
@@ -44,7 +55,7 @@
             this.update = function() {
                 var h, i, l;
 
-                if (debug) console.log(this);
+                if (debug) console.info(this);
 
                 // Nothing to do
                 if (!this.content) return;
@@ -92,7 +103,7 @@
                         }
                     }
                 }
-                if (debug) console.log('Updating...');
+                if (debug) console.info('AppLayout: Layout instance updated');
             };
         },
         AppLayouts = {
@@ -101,7 +112,7 @@
                 // Create new object
                 var v = new AppLayout();
 
-                if (debug) console.log('Run create...');
+                if (debug) console.info('AppLayout: Create(options: ', options, ')');
 
                 // Define settings
                 v.settings = extend(this.prototype.defaults, options);
@@ -113,7 +124,7 @@
                 return v;
             },
             update: function() {
-                if (debug) console.log('Update all instaneces...');
+                if (debug) console.info('AppLayout: Update all instances...');
                 
                 var i, l = AppLayouts.items.length;
 
@@ -139,22 +150,31 @@
     body = document.body;
     console = window.console;
 
+    if (debug) console.time('AppLayout Init');
+
     // Activating on document ready should leave room to modify any settings
     window.document.onreadystatechange = function() {
-        if (window.document.readyState == "complete") {
-            if (debug) console.log('Initialise...');
+        if (window.document.readyState == "complete" && AppLayouts.items.length === 0) {
+            if (debug) console.info('AppLayout: Document ready initialise...');
             AppLayouts.create();
         }
     };
 
     window.addEventListener(AppLayouts.prototype.eventName, function() {
-        if (debug) console.log('Change event...');
+        if (debug) {
+            console.time('AppLayout Change');
+            console.info('AppLayout: Change event...');
+        }
 
         AppLayouts.update();
+        
+        if (debug) console.timeEnd('AppLayout Change');
     }, false);
 
-    if (debug) console.log('Running');
+    if (debug) console.info('AppLayout: Start...');
 
     // Export globally
     window.AppLayouts = AppLayouts;
+    
+    if (debug) console.timeEnd('AppLayout Init');
 }(window));
