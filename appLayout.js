@@ -1,5 +1,5 @@
+/*! appLayout.js v0.0.4 | (c) 2014 Martin Adamko | Licence MIT */
 /*jslint browser: true*/
-/*! appLayout.js v0.0.3 | (c) 2014 Martin Adamko | Licence MIT */
 (function(window, eventName) {
     var debug = window.location.search.match(/[\?&]debug-app-layout=true/) ? true : false,
         document,
