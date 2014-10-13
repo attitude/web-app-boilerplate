@@ -1,29 +1,34 @@
-/*! appLayout.js v0.0.4 | (c) 2014 Martin Adamko | Licence MIT */
+/*! appLayout.js v0.1.0 | (c) 2014 Martin Adamko | Licence MIT */
 /*jslint browser: true*/
-(function(window, eventName) {
+(function (window, StatusBar) {
+    'use strict';
     var debug = window.location.search.match(/[\?&]debug-app-layout=true/) ? true : false,
         document,
         console,
         body,
         // Extend a given object with all the properties in passed-in object(s).
         // source: https://raw.githubusercontent.com/lodash/lodash/2.4.1/dist/lodash.underscore.js
-        extend = function(object) {
+        extend = function (object) {
             if (!object) {
                 return object;
             }
-            for (var argsIndex = 1, argsLength = arguments.length; argsIndex < argsLength; argsIndex++) {
-                var iterable = arguments[argsIndex];
+            var argsIndex, argsLength, iterable, key;
+
+            for (argsIndex = 1, argsLength = arguments.length; argsIndex < argsLength; argsIndex += 1) {
+                iterable = arguments[argsIndex];
                 if (iterable) {
-                    for (var key in iterable) {
-                        object[key] = iterable[key];
+                    for (key in iterable) {
+                        if (iterable.hasOwnProperty(key)) {
+                            object[key] = iterable[key];
+                        }
                     }
                 }
             }
             return object;
         },
-        AppLayout = function() {
+        AppLayout = function () {
             this.settings = {};
-            this.init = function() {
+            this.init = function () {
                 var i, l, el;
 
                 // Set empty array
@@ -42,7 +47,7 @@
                 }
 
                 if (!this.content[0]) {
-                    if (debug) console.warn('AppLayout: Content element(s) #' + this.settings.content.join(', #') + '  missing.');
+                    if (debug) { console.warn('AppLayout: Content element(s) #' + this.settings.content.join(', #') + '  missing.'); }
 
                     return;
                 }
@@ -53,7 +58,7 @@
                 if (this.headerContainer) {
                     this.headerContainer = this.headerContainer[0];
                 } else {
-                    if (debug) console.info('AppLayout: Header element #' + this.settings.header + ' is missing');
+                    if (debug) { console.info('AppLayout: Header element #' + this.settings.header + ' is missing'); }
                 }
 
                 this.footer = window.document.getElementById(this.settings.footer.replace(/#/, ''));
@@ -61,48 +66,48 @@
                 if (this.footerContainers) {
                     this.footerContainers = this.footerContainers[0];
                 } else {
-                    if (debug) console.info('AppLayout: Footer element  #' + this.settings.footer + '  missing.');
+                    if (debug) { console.info('AppLayout: Footer element  #' + this.settings.footer + '  missing.'); }
                 }
 
                 this.update();
             };
-            this.update = function() {
+            this.update = function () {
                 var h, i, l;
 
-                if (debug) console.info(this);
+                if (debug) { console.info(this); }
 
                 // Nothing to do
-                if (!this.content[0]) return;
+                if (!this.content[0]) { return; }
 
                 l = this.content.length;
 
                 // Udate padding for header
                 if (this.header) {
-                    h = parseInt(this.header.offsetHeight);
+                    h = parseInt(this.header.offsetHeight, 10);
 
-                    if (this.settings.isDefaultView && typeof window.StatusBar === 'object') {
-                        h -= window.StatusBar.offset;
+                    if (this.settings.isDefaultView && typeof StatusBar === 'object') {
+                        h -= StatusBar.offset;
                     }
 
                     for (i = 0; i < l; i += 1) {
                         // Offset top for default view/layout
-                        if (this.settings.isDefaultView && typeof window.StatusBar === 'object') {
-                            this.content[i].style.top = window.StatusBar.offset + 'px';
+                        if (this.settings.isDefaultView && typeof StatusBar === 'object') {
+                            this.content[i].style.top = StatusBar.offset + 'px';
                         }
 
                         // Add padding so that when hiding header while scrolling is possible
-                        if (this.content[i].style.paddingTop != h + 'px') {
+                        if (this.content[i].style.paddingTop !== h + 'px') {
                             this.content[i].style.paddingTop = h + 'px';
                         }
 
                         if (this.headerContainer) {
-                            this.content[i].parentElement.classList.remove(
-                                this.settings.content + '-' + this.settings.header + '-' + AppLayouts.prototype.className
+                            body.parentElement.classList.remove(
+                                this.settings.content[i] + '-' + this.settings.header.replace(/#/, '') + '-' + AppLayouts.prototype.className
                             );
 
                             if (this.headerContainer.offsetWidth > this.headerContainer.parentElement.offsetWidth) {
                                 body.parentElement.classList.add(
-                                    this.settings.content + '-' + this.settings.header + '-' + AppLayouts.prototype.className
+                                    this.settings.content[i] + '-' + this.settings.header.replace(/#/, '') + '-' + AppLayouts.prototype.className
                                 );
                             }
                         }
@@ -111,40 +116,40 @@
 
                 // Udate padding for footer
                 if (this.footer) {
-                    h = parseInt(this.footer.offsetHeight);
+                    h = parseInt(this.footer.offsetHeight, 10);
 
                     for (i = 0; i < l; i += 1) {
                         // Add padding so that when hiding header while scrolling is possible
-                        if (this.content[i].style.paddingBottom != h + 'px') {
+                        if (this.content[i].style.paddingBottom !== h + 'px') {
                             this.content[i].style.paddingBottom = h + 'px';
                         }
 
                         if (this.footerContainer) {
-                            this.content[i].parentElement.classList.remove(
-                                this.settings.content + '-' + this.settings.footer + '-' + AppLayouts.prototype.className
+                            body.parentElement.classList.remove(
+                                this.settings.content[i] + '-' + this.settings.footer.replace(/#/, '') + '-' + AppLayouts.prototype.className
                             );
 
                             if (this.footerContainer.offsetWidth > this.footerContainer.parentElement.offsetWidth) {
                                 body.parentElement.classList.add(
-                                    this.settings.content + '-' + this.settings.footer + '-' + AppLayouts.prototype.className
+                                    this.settings.content[i] + '-' + this.settings.footer.replace(/#/, '') + '-' + AppLayouts.prototype.className
                                 );
                             }
                         }
                     }
                 }
-                if (debug) console.info('AppLayout: Layout instance updated');
+                if (debug) { console.info('AppLayout: Layout instance updated'); }
             };
         },
         AppLayouts = {
             running: false,
             items: [],
-            create: function(options) {
+            create: function (options) {
                 // Create new object
                 var v = new AppLayout();
 
                 AppLayouts.running = true;
 
-                if (debug) console.info('AppLayout: Create(options: ', options, ')');
+                if (debug) { console.info('AppLayout: Create(options: ', options, ')'); }
 
                 // Define settings
                 v.settings = extend(AppLayouts.prototype.defaults, options);
@@ -155,8 +160,8 @@
                 // return current object
                 return v;
             },
-            update: function() {
-                if (debug) console.info('AppLayout: Update all instances...');
+            update: function () {
+                if (debug) { console.info('AppLayout: Update all instances...'); }
 
                 var i, l = AppLayouts.items.length;
 
@@ -174,7 +179,7 @@
                     footer: '#footer',
                     // Expecting one class
                     containers: '.container',
-                    // Special option to add 20px more using the window.StatusBar object
+                    // Special option to add 20px more using the StatusBar object
                     isDefaultView: false
                 },
                 eventName: 'resize',
@@ -186,19 +191,17 @@
     body = document.body;
     console = window.console;
 
-    if (debug) console.time('AppLayout Init');
+    if (debug) { console.time('AppLayout Init'); }
 
     // Activating on document ready should leave room to modify any settings
-    window.document.onreadystatechange = function() {
-        if (window.document.readyState == "complete" && AppLayouts.items.length === 0) {
-            if (debug) console.info('AppLayout: Document ready initialise...');
-            AppLayouts.create({
-                isDefaultView: true
-            });
+    window.document.onreadystatechange = function () {
+        if (window.document.readyState === "complete" && AppLayouts.items.length === 0) {
+            if (debug) { console.info('AppLayout: Document ready initialise...'); }
+            AppLayouts.create({isDefaultView: true});
         }
     };
 
-    window.addEventListener(AppLayouts.prototype.eventName, function() {
+    window.addEventListener(AppLayouts.prototype.eventName, function () {
         if (debug) {
             console.time('AppLayout Change');
             console.info('AppLayout: Change event...');
@@ -206,23 +209,21 @@
 
         setTimeout(AppLayouts.update, 100);
 
-        if (debug) console.timeEnd('AppLayout Change');
+        if (debug) { console.timeEnd('AppLayout Change'); }
     }, false);
 
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
         // Fallback for iOS 4
         if (!AppLayouts.running) {
-            if (debug) window.console.log('AppLayout: Window loaded...');
-            AppLayouts.create({
-                isDefaultView: true
-            });
+            if (debug) { console.log('AppLayout: Window loaded...'); }
+            AppLayouts.create({isDefaultView: true});
         }
     }, false);
 
-    if (debug) console.info('AppLayout: Start...');
+    if (debug) { console.info('AppLayout: Start...'); }
 
     // Export globally
     window.AppLayouts = AppLayouts;
 
-    if (debug) console.timeEnd('AppLayout Init');
-}(window));
+    if (debug) { console.timeEnd('AppLayout Init'); }
+}(window, window.StatusBar));
