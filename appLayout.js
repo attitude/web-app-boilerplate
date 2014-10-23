@@ -207,7 +207,7 @@
             console.info('AppLayout: Change event...');
         }
 
-        setTimeout(AppLayouts.update, 100);
+        setTimeout(AppLayouts.update, 500);
 
         if (debug) { console.timeEnd('AppLayout Change'); }
     }, false);
